@@ -17,7 +17,7 @@ public class EmailMessageService {
         try {
             return mapper.readValue(data, EmailMessage.class);
         } catch (JsonProcessingException e) {
-            throw new EmailMessageProcessingException("Ошибка при маппинге EmailMessage");
+            throw new EmailMessageProcessingException(Constant.EMAIL_MESSAGE_PROCESSING_EXCEPTION_TEXT);
         }
     }
 

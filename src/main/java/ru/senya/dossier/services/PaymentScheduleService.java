@@ -19,7 +19,7 @@ public class PaymentScheduleService {
         try {
             return mapper.readValue(data, new TypeReference<>() {});
         } catch (JsonProcessingException e) {
-            throw new PaymentScheduleProcessingException("Ошибка при маппинге PaymentSchedule");
+            throw new PaymentScheduleProcessingException(Constant.PAYMENT_SCHEDULE_PROCESSING_EXCEPTION_TEXT);
         }
 
     }

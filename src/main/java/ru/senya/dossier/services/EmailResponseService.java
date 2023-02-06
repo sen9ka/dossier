@@ -24,46 +24,46 @@ public class EmailResponseService {
         Application application = applicationService.findApplicationByApplicationId(applicationId);
         LoanOfferDTO loanOfferDTO = loanOfferService.convertToLoanOfferDTO(application.getAppliedOffer());
 
-        return emailClient.sendEmail(application.getClientId().getEmail(), "Завершите оформление", "Подтвердите выбор заявки: \n"
-                + "\nЗапрашиваемая сумма: " + loanOfferDTO.getRequestedAmount()
-                + "\nИтоговая сумма: " + loanOfferDTO.getTotalAmount()
-                + "\nСрок: " + loanOfferDTO.getTerm() + " месяцев"
-                + "\nЕжемесячный платеж: " + loanOfferDTO.getMonthlyPayment()
-                + "\nВключена страховка: " + loanOfferDTO.getIsInsuranceEnabled()
-                + "\nЗарплатный клиент: " + loanOfferDTO.getIsSalaryClient());
+        return emailClient.sendEmail(application.getClientId().getEmail(), Constant.COMPLETE_CLEARANCE_SUBJECT, Constant.CONFIRM_SELECTION
+                + Constant.REQUESTED_AMOUNT + loanOfferDTO.getRequestedAmount()
+                + Constant.TOTAL_AMOUNT + loanOfferDTO.getTotalAmount()
+                + Constant.TERM + loanOfferDTO.getTerm() + Constant.MONTHS
+                + Constant.MONTHLY_PAYMENT + loanOfferDTO.getMonthlyPayment()
+                + Constant.INSURANCE_ENABLED + loanOfferDTO.getIsInsuranceEnabled()
+                + Constant.SALARY_CLIENT + loanOfferDTO.getIsSalaryClient());
     }
 
     public SimpleMailMessage sendCreateDocumentsEmail(Long applicationId) {
         Application application = applicationService.findApplicationByApplicationId(applicationId);
         Credit credit = application.getCreditId();
 
-        return emailClient.sendEmail(application.getClientId().getEmail(), "Перейти к оформлению документов", "Перейти к оформлению документов с условиями: \n"
-                + "\nСумма: " + credit.getAmount()
-                + "\nСрок: " + credit.getTerm() + " месяцев"
-                + "\nЕжемесячный платеж: " + credit.getMonthlyPayment()
-                + "\nСтавка: " + credit.getRate()
-                + "\nПСК: " + credit.getPsk()
-                + "\nРасписание платежей: " + paymentScheduleInfo(paymentScheduleService.getPaymentScheduleElementList(credit.getPaymentSchedule()))
-                + "\nВключена страховка: " + credit.getInsuranceEnable()
-                + "\nЗарплатный клиент: " + credit.getSalaryClient());
+        return emailClient.sendEmail(application.getClientId().getEmail(), Constant.GO_TO_PAPERWORK, Constant.GO_TO_PAPERWORK_WITH_CONDITIONS
+                + Constant.AMOUNT + credit.getAmount()
+                + Constant.TERM + credit.getTerm() + Constant.MONTHS
+                + Constant.MONTHLY_PAYMENT + credit.getMonthlyPayment()
+                + Constant.RATE + credit.getRate()
+                + Constant.PSK + credit.getPsk()
+                + Constant.PAYMENT_SCHEDULE + paymentScheduleInfo(paymentScheduleService.getPaymentScheduleElementList(credit.getPaymentSchedule()))
+                + Constant.INSURANCE_ENABLED + credit.getInsuranceEnable()
+                + Constant.SALARY_CLIENT + credit.getSalaryClient());
     }
 
     private String paymentScheduleInfo(List<PaymentScheduleElement> paymentScheduleElementList) {
         StringBuilder paymentScheduleElements = new StringBuilder();
         for (int i = 0; i < paymentScheduleElementList.size(); i++) {
-            paymentScheduleElements.append("\nНомер платежа: ");
+            paymentScheduleElements.append(Constant.PAYMENT_NUMBER);
             paymentScheduleElements.append(i + 1);
-            paymentScheduleElements.append("\nДата платежа: ");
+            paymentScheduleElements.append(Constant.PAYMENT_DATE);
             paymentScheduleElements.append(paymentScheduleElementList.get(i).getDate());
-            paymentScheduleElements.append("\nОбщий платеж: ");
+            paymentScheduleElements.append(Constant.TOTAL_PAYMENT);
             paymentScheduleElements.append(paymentScheduleElementList.get(i).getTotalPayment());
-            paymentScheduleElements.append("\nПлатеж без долга: ");
+            paymentScheduleElements.append(Constant.INTEREST_PAYMENT);
             paymentScheduleElements.append(paymentScheduleElementList.get(i).getInterestPayment());
-            paymentScheduleElements.append("\nПлатеж по долгу: ");
+            paymentScheduleElements.append(Constant.DEBT_PAYMENT);
             paymentScheduleElements.append(paymentScheduleElementList.get(i).getDebtPayment());
-            paymentScheduleElements.append("\nОстаток суммы: ");
+            paymentScheduleElements.append(Constant.REMAINING_DEBT);
             paymentScheduleElements.append(paymentScheduleElementList.get(i).getRemainingDebt());
-            paymentScheduleElements.append("\n");
+            paymentScheduleElements.append(Constant.NEW_STRING);
         }
         return paymentScheduleElements.toString();
     }
@@ -71,22 +71,21 @@ public class EmailResponseService {
     public SimpleMailMessage sendSendDocumentsEmail(Long applicationId) {
         Application application = applicationService.findApplicationByApplicationId(applicationId);
 
-        return emailClient.sendEmail(application.getClientId().getEmail(), "Документы сформированы",
-                "Документы по кредитной заявке оформлены. Для завершения, отправьте запрос на подписание");
+        return emailClient.sendEmail(application.getClientId().getEmail(), Constant.DOCUMENTS_GENERATED_SUBJECT,
+                Constant.DOCUMENTS_GENERATED_BODY);
     }
 
     public SimpleMailMessage sendSesCodeEmail(Long applicationId) {
         Application application = applicationService.findApplicationByApplicationId(applicationId);
-        return emailClient.sendEmail(application.getClientId().getEmail(), "Подписание документов",
-                "\nСсылка на подписание: google.com"
-                + "\nВаш ПЭП-код: " + ((int)(Math.random()*9000)+1000));
+        return emailClient.sendEmail(application.getClientId().getEmail(), Constant.SEND_SES_SUBJECT,
+                Constant.SIGN_URL + Constant.CURRENT_URL + Constant.YOUR_SES_CODE + ((int)(Math.random()*9000)+1000));
     }
 
     public SimpleMailMessage sendApplicationDeniedEmail(Long applicationId) {
         Application application = applicationService.findApplicationByApplicationId(applicationId);
         application.setStatus(ApplicationStatus.CC_DENIED);
-        return emailClient.sendEmail(application.getClientId().getEmail(), "В кредите отказано",
-                "Банк принял решение отказать в кредите");
+        return emailClient.sendEmail(application.getClientId().getEmail(), Constant.APPLICATION_DENIED_SUBJECT,
+                Constant.APPLICATION_DENIED_BODY);
     }
 
 }

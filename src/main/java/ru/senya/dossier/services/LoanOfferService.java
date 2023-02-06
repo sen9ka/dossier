@@ -17,7 +17,7 @@ public class LoanOfferService {
         try {
             return mapper.readValue(data, LoanOfferDTO.class);
         } catch (JsonProcessingException e) {
-            throw new LoanOfferProcessingException("Ошибка при маппинге LoanOffer");
+            throw new LoanOfferProcessingException(Constant.LOAN_OFFER_PROCESSING_EXCEPTION_TEXT);
         }
     }
 }
