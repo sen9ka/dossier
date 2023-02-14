@@ -8,8 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 import ru.senya.dossier.entity.dto.EmailMessage;
-import ru.senya.dossier.services.EmailMessageService;
-import ru.senya.dossier.services.EmailResponseService;
+import ru.senya.dossier.service.EmailMessageService;
+import ru.senya.dossier.service.EmailResponseService;
 
 @Component
 @RequiredArgsConstructor
