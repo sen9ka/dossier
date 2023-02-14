@@ -1,5 +1,7 @@
 package ru.senya.dossier.config;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +13,7 @@ import ru.senya.dossier.services.EmailResponseService;
 
 @Component
 @RequiredArgsConstructor
+@Tag(name = "Микросервис Dossier - чтение сообщений из кафки и отправка документов")
 public class KafkaListeners {
 
     Logger logger = LoggerFactory.getLogger(KafkaListeners.class);
@@ -18,38 +21,43 @@ public class KafkaListeners {
     private final EmailMessageService emailMessageService;
 
     @KafkaListener(topics = "finish-registration", groupId = "finishRegistration")
-    void FinishRegistrationListener(String data) {
-        logger.info("Listener received" + data);
+    @Operation(summary = "Отправка сообщения с выбранным условием")
+    void finishRegistrationListener(String data) {
+        logger.info(data);
         EmailMessage emailMessage = emailMessageService.convertToEmailMessage(data);
         emailResponseService.sendFinishRegistrationEmail(emailMessage.getApplicationId());
         logger.info("FinishRegistrationListener отправил сообщение");
     }
 
     @KafkaListener(topics = "create-documents", groupId = "createDocuments")
-    void CreateDocumentsListener(String data) {
-        logger.info("Listener received" + data);
+    @Operation(summary = "Отправка сообщения с расчитанным кредитом")
+    void createDocumentsListener(String data) {
+        logger.info(data);
         EmailMessage emailMessage = emailMessageService.convertToEmailMessage(data);
         emailResponseService.sendCreateDocumentsEmail(emailMessage.getApplicationId());
         logger.info("CreateDocumentsListener отправил сообщение");
     }
 
     @KafkaListener(topics = "send-documents", groupId = "sendDocuments")
+    @Operation(summary = "Отправка сообщения с сформированными документами")
     void sendDocumentsListener(String data) {
-        logger.info("Listener received" + data);
+        logger.info(data);
         EmailMessage emailMessage = emailMessageService.convertToEmailMessage(data);
         emailResponseService.sendSendDocumentsEmail(emailMessage.getApplicationId());
     }
 
     @KafkaListener(topics = "send-ses", groupId = "sendSes")
+    @Operation(summary = "Отправка сообщения с кодом")
     void sendSesListener(String data) {
-        logger.trace("Listener received" + data);
+        logger.info(data);
         EmailMessage emailMessage = emailMessageService.convertToEmailMessage(data);
         emailResponseService.sendSesCodeEmail(emailMessage.getApplicationId());
     }
 
     @KafkaListener(topics = "application-denied", groupId = "sendSes")
+    @Operation(summary = "Отправка сообщения об отказе")
     void applicationDeniedListener(String data) {
-        logger.trace("Listener received" + data);
+        logger.info(data);
         EmailMessage emailMessage = emailMessageService.convertToEmailMessage(data);
         emailResponseService.sendApplicationDeniedEmail(emailMessage.getApplicationId());
     }
